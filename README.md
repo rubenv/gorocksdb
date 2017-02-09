@@ -19,6 +19,6 @@ If you built RocksDB you can install gorocksdb now:
     CGO_LDFLAGS="-L/path/to/rocksdb -lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy -llz4" \
       go get -tags=dynamic github.com/rubenv/gorocksdb
 
-## Relation to tecbot/gorocksdb
+## Relation to [tecbot/gorocksdb](https://github.com/tecbot/gorocksdb)
 
 This version of gorocksdb uses the embedded version by default.
