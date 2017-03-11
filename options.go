@@ -218,8 +218,19 @@ func (opts *Options) IncreaseParallelism(total_threads int) {
 //
 // Use this if you don't need to keep the data sorted, i.e. you'll never use
 // an iterator, only Put() and Get() API calls
+//
+// If you use this with rocksdb >= 5.0.2, you must call `SetAllowConcurrentMemtableWrites(false)`
+// to avoid an assertion error immediately on opening the db.
 func (opts *Options) OptimizeForPointLookup(block_cache_size_mb uint64) {
 	C.rocksdb_options_optimize_for_point_lookup(opts.c, C.uint64_t(block_cache_size_mb))
+}
+
+// Set whether to allow concurrent memtable writes. Conccurent writes are
+// not supported by all memtable factories (currently only SkipList memtables).
+// As of rocksdb 5.0.2 you must call `SetAllowConcurrentMemtableWrites(false)`
+// if you use `OptimizeForPointLookup`.
+func (opts *Options) SetAllowConcurrentMemtableWrites(allow bool) {
+	C.rocksdb_options_set_allow_concurrent_memtable_write(opts.c, boolToChar(allow))
 }
 
 // OptimizeLevelStyleCompaction optimize the DB for leveld compaction.
@@ -451,18 +462,6 @@ func (opts *Options) SetMaxBytesForLevelMultiplierAdditional(value []int) {
 	C.rocksdb_options_set_max_bytes_for_level_multiplier_additional(opts.c, &cLevels[0], C.size_t(len(value)))
 }
 
-// SetDisableDataSync enable/disable data sync.
-//
-// If true, then the contents of data files are not synced
-// to stable storage. Their contents remain in the OS buffers till the
-// OS decides to flush them. This option is good for bulk-loading
-// of data. Once the bulk-loading is complete, please issue a
-// sync to the OS to flush all dirty buffers to stable storage.
-// Default: false
-func (opts *Options) SetDisableDataSync(value bool) {
-	C.rocksdb_options_set_disable_data_sync(opts.c, C.int(btoi(value)))
-}
-
 // SetUseFsync enable/disable fsync.
 //
 // If true, then every store to stable storage will issue a fsync.
@@ -676,14 +675,6 @@ func (opts *Options) SetPurgeRedundantKvsWhileFlush(value bool) {
 	C.rocksdb_options_set_purge_redundant_kvs_while_flush(opts.c, boolToChar(value))
 }
 
-// SetAllowOsBuffer enable/disable os buffer.
-//
-// Data being read from file storage may be buffered in the OS
-// Default: true
-func (opts *Options) SetAllowOsBuffer(value bool) {
-	C.rocksdb_options_set_allow_os_buffer(opts.c, boolToChar(value))
-}
-
 // SetAllowMmapReads enable/disable mmap reads for reading sst tables.
 // Default: false
 func (opts *Options) SetAllowMmapReads(value bool) {
@@ -694,6 +685,18 @@ func (opts *Options) SetAllowMmapReads(value bool) {
 // Default: true
 func (opts *Options) SetAllowMmapWrites(value bool) {
 	C.rocksdb_options_set_allow_mmap_writes(opts.c, boolToChar(value))
+}
+
+// SetUseDirectReads enable/disable direct I/O mode (O_DIRECT) for reads
+// Default: false
+func (opts *Options) SetUseDirectReads(value bool) {
+	C.rocksdb_options_set_use_direct_reads(opts.c, boolToChar(value))
+}
+
+// SetUseDirectWrites enable/disable direct I/O mode (O_DIRECT) for writes
+// Default: false
+func (opts *Options) SetUseDirectWrites(value bool) {
+	C.rocksdb_options_set_use_direct_writes(opts.c, boolToChar(value))
 }
 
 // SetIsFdCloseOnExec enable/dsiable child process inherit open files.
