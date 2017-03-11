@@ -22,3 +22,7 @@ If you built RocksDB you can install gorocksdb now:
 ## Relation to [tecbot/gorocksdb](https://github.com/tecbot/gorocksdb)
 
 This version of gorocksdb uses the embedded version by default.
+
+The version by [tecbot](https://github.com/tecbot/gorocksdb) is still
+considered the upstream: please submit fixes and pull requests there. I'll
+periodically merge changes back to this repository.
